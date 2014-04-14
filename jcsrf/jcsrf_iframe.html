@@ -1,0 +1,15 @@
+<html>
+  <head>
+  <script src="jquery.js"></script>
+  <body>
+    <h1>Iframe</h1>
+    <script>
+      var origin = /\?origin=([a-zA-Z0-9\.-_]+)/.exec(document.URL)[1]
+      var http = new XMLHttpRequest();
+      http.open("GET", "/jcsrf_token?origin=" + origin, false);
+      http.setRequestHeader("X-No-Csrf", "true");
+      http.send(null);
+      parent.postMessage(http.responseText, "http://" + origin);
+    </script>
+  </body>
+</html>

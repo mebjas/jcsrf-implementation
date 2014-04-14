@@ -1,0 +1,29 @@
+This package contains the source for the jCSRF prototype, plus a simple test application.
+
+To run jCSRF, simply use:
+  sudo python proxy.py 8000
+
+Your webserver running on port 80 on your local machine will be
+automatically protected.
+
+There are also cmdline options, look at the source. Also CTRL+C and
+CTRL+/ can disable CSRF protection and proxy interception.
+
+If you want to change the port used by the proxy, you might have to modify
+the iptables script that sets up the interception of packets to port
+80.
+
+Your server needs to be configured to force HTTP 1.0 responses,
+because some HTTP 1.1 features are not supported by the proxy
+(e.g. chunked encoding).
+
+The ipfilter interposition script only works for Linux, but if you can
+somehow route the packets through your proxy on another operating
+system, I expect the proxy itself will run well on all platforms.
+
+The js file works with Chrome and Firefox. All the features used are
+supported by IE as well, but some small adjustments to the code might
+be required.
+
+Riccardo
+<r.pelizzi@gmail.com>
