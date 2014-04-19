@@ -41,28 +41,27 @@ class csrfGuard
 	 */
 	public static function authorisePost()
 	{
-		//#todo: remove redundant csrfGuard::refreshCookie() in code, decrease LOC
-
 		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 			//currently for same origin only
-			if(isset($_POST[csrfGuard::$postName]) 
+			if!(isset($_POST[csrfGuard::$postName]) 
 				&& isset($_COOKIE[csrfGuard::$cookieName])
 				&& ($_POST[csrfGuard::$postName] === $_COOKIE[csrfGuard::$cookieName])
 				) {
-				csrfGuard::refreshCookie();		
-			} else {
+
 				//#todo: if validations fails
 				//#perform as per configuration
 
 				//default operation: strip all post
-				unset($_POST);
-				csrfGuard::refreshCookie();	
+				unset($_POST);	
 			}
-		} else {
-			//#todo: incase of a get request, generate / refresh the auth token
-			csrfGuard::refreshCookie();	
-		}
+		} 
+
+		/**
+		 * in case cookie exist -> refresh it
+		 * else create one
+		 */
+		csrfGuard::refreshCookie();	
 	}
 
 	/**
