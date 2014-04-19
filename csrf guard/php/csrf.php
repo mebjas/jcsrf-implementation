@@ -42,5 +42,5 @@ function csrf_ob_handler($buffer, $flags) {
 
 
 // Initialize our handler
-	ob_start('csrf_ob_handler');	//#todo: feature to not run this when required
+ob_start('csrf_ob_handler');	//#todo: feature to not run this when required
 

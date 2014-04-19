@@ -41,6 +41,8 @@ class csrfGuard
 	 */
 	public static function authorisePost()
 	{
+		//#todo: remove redundant csrfGuard::refreshCookie() in code, decrease LOC
+
 		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 			//currently for same origin only
@@ -52,9 +54,14 @@ class csrfGuard
 			} else {
 				//#todo: if validations fails
 				//#perform as per configuration
+
+				//default operation: strip all post
+				unset($_POST);
+				csrfGuard::refreshCookie();	
 			}
 		} else {
 			//#todo: incase of a get request, generate / refresh the auth token
+			csrfGuard::refreshCookie();	
 		}
 	}
 
