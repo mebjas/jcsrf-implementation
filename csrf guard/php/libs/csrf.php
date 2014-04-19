@@ -1,5 +1,4 @@
 <?php
-namespace csrfGuard;
 
 class csrfGuard
 {
@@ -44,10 +43,10 @@ class csrfGuard
 		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 			//currently for same origin only
-			if!(isset($_POST[csrfGuard::$postName]) 
+			if(!(isset($_POST[csrfGuard::$postName]) 
 				&& isset($_COOKIE[csrfGuard::$cookieName])
 				&& ($_POST[csrfGuard::$postName] === $_COOKIE[csrfGuard::$cookieName])
-				) {
+				)) {
 
 				//#todo: if validations fails
 				//#perform as per configuration
