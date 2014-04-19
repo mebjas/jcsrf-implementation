@@ -1,87 +1,35 @@
 <?php
-namespace csrfGuard;
 
-class csrfGuard
-{
-	/**
-	 * Name of the cookie sent to client
-	 */
-	public static $cookieName = 'CSRF_AUTH_TOKEN';
+include_once __DIR__ .'/libs/csrf.php';
 
-	/**
-	 * Name of the POST variable sent from client
-	 */
-	public static $postName = 'CSRF_AUTH_TOKEN';
 
-	/**
-	 * expiry time for cookie
-	 */
-	public static $cookieExpiryTime = 300;	//5 minutes
-	
-	/**
-	 * function to authorise incoming post requests
-	 */
-	public static function authorisePost()
-	{
-		if(isset($_POST)) {
-			if(isset($_POST[csrfGuard::$postName]) 
-				&& isset($_COOKIE[csrfGuard::$cookieName])
-				&& ($_POST[csrfGuard::$postName] === $_COOKIE[csrfGuard::$cookieName])
-				) {
-				csrfGuard::refreshCookie();		
-			}
-		}
-	}
+csrfGuard::authorisePost();
 
-	/**
-	 * function to refresh cookie sent to browser
-	 */
-	public static function refreshCookie()
-	{
-		if(!isset($_COOKIE[csrfGuard::$cookieName])) {
-			csrfGuard::createCookie();
-		} else {
-			//reset the cookie to a longer period
-			setcookie(csrfGuard::$cookieName, $_COOKIE[csrfGuard::$cookieName], time() + csrfGuard::$cookieExpiryTime);
-		}
-	}
 
-	/**
-	 * 
-	 */
-	public static function createCookie()
-	{
-		setcookie(csrfGuard::$cookieName, csrfGuard::generateAuthToken(128), time() + csrfGuard::$cookieExpiryTime);
-	}
+/**
+ * Rewrites <form> on the fly to add CSRF tokens to them. This can also
+ * inject our JavaScript library.
+ */
+function csrf_ob_handler($buffer, $flags) {
 
-	/**
-	 * function to generate random hash of length as given in parameter
-	 * max length = 128
-	 * @param: length to hash required, int
-	 */
-	public static function generateAuthToken($length = 128)
-	{
-		//if $length > 128 throw exception #todo 
+    // Even though the user told us to rewrite, we should do a quick heuristic
+    // to check if the page is *actually* HTML. We don't begin rewriting until
+    // we hit the first <html tag.
+    static $is_html = false;
+    if (!$is_html) {
+        // not HTML until proven otherwise
+        if (stripos($buffer, '<html') !== false) {
+            $is_html = true;
+        } else {
+            return $buffer;
+        }
+    }
 
-		if (function_exists("hash_algos") && in_array("sha512", hash_algos())) {
-			$token = hash("sha512", mt_rand(0, mt_getrandmax()));
-		} else {
-			$token=' ';
-			for ($i=0;$i<128;++$i)
-			{
-				$r=mt_rand(0,35);
-				if ($r<26)
-				{
-					$c=chr(ord('a')+$r);
-				}
-				else
-				{ 
-					$c=chr(ord('0')+$r-26);
-				} 
-				$token.=$c;
-			}
-		}
-		return substr($token, 0, $length);
-	}
-};
-
+    $script = '<script type="text/javascript">CsrfMagic.end();</script>';
+    $buffer = str_ireplace('</body>', $script . '</body>', $buffer, $count);
+    if (!$count) {
+        $buffer .= $script;
+    }
+    
+    return $buffer;
+}
