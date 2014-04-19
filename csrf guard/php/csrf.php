@@ -1,10 +1,10 @@
 <?php
 
+include_once __DIR__ .'/config/csrf.config.inc.php';
 include_once __DIR__ .'/libs/csrf.php';
 
-
-csrfGuard::authorisePost();
-
+//Initialise CSRFGuard library
+csrfGuard::initialise();
 
 /**
  * Rewrites <form> on the fly to add CSRF tokens to them. This can also
@@ -25,11 +25,22 @@ function csrf_ob_handler($buffer, $flags) {
         }
     }
 
-    $script = '<script type="text/javascript">CsrfMagic.end();</script>';
+    if(CSRFGuard::$isSameOrigin) {
+    	$script = '<script type="text/javascript" src="' .CSRF_SELF .SAME_ORIGIN_JS .'"></script>';	
+    } else {
+    	$script = '<script type="text/javascript" src="' .CSRF_SELF .CROSS_ORIGIN_JS .'"></script>';
+    }
+
+    //implant the CSRFGuard js file to outgoing script
     $buffer = str_ireplace('</body>', $script . '</body>', $buffer, $count);
     if (!$count) {
         $buffer .= $script;
     }
-    
+
     return $buffer;
 }
+
+
+// Initialize our handler
+	ob_start('csrf_ob_handler');	//#todo: feature to not run this when required
+

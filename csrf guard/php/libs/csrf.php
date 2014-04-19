@@ -17,7 +17,25 @@ class csrfGuard
 	 * expiry time for cookie
 	 */
 	public static $cookieExpiryTime = 300;	//5 minutes
+
+	/**
+	 * flag for cross origin/same origin request
+	 */
+	public static $isSameOrigin = true;	//5 minutes
+
+
 	
+	/**
+	 * function to initialise the CSRFGuard work flow
+	 */
+	public static function initialise()
+	{
+		//#todo: code to check origin of the reqeust
+
+		//authorise the incoming request
+		csrfGuard::authorisePost();
+	}
+
 	/**
 	 * function to authorise incoming post requests
 	 */
@@ -35,6 +53,8 @@ class csrfGuard
 				//#todo: if validations fails
 				//#perform as per configuration
 			}
+		} else {
+			//#todo: incase of a get request, generate / refresh the auth token
 		}
 	}
 
