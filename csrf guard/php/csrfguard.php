@@ -25,10 +25,17 @@ function csrf_ob_handler($buffer, $flags) {
         }
     }
 
+    //#todo check if file exists
     if(CSRFGuard::$isSameOrigin) {
-    	$script = '<script type="text/javascript" src="' .CSRF_SELF .SAME_ORIGIN_JS .'"></script>';	
+        if(!file_exists(CSRFGUARD_SELF .SAME_ORIGIN_JS)) {
+            die("CSRFGuard js file not found!");
+        }
+    	$script = '<script type="text/javascript" src="' .CSRFGUARD_SELF .SAME_ORIGIN_JS .'"></script>';	
     } else {
-    	$script = '<script type="text/javascript" src="' .CSRF_SELF .CROSS_ORIGIN_JS .'"></script>';
+        if(!file_exists(CSRFGUARD_SELF .CROSS_ORIGIN_JS)) {
+            die("CSRFGuard js file not found!");
+        }
+    	$script = '<script type="text/javascript" src="' .CSRFGUARD_SELF .CROSS_ORIGIN_JS .'"></script>';
     }
 
     //implant the CSRFGuard js file to outgoing script
