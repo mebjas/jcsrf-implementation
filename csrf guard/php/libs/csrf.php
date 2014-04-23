@@ -40,6 +40,8 @@ class csrfGuard
 	 */
 	public static function authorisePost()
 	{
+		//#todo this method is valid for same origin request only
+		//for cross origin the functionality is different
 		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 			//currently for same origin only
