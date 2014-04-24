@@ -1,6 +1,6 @@
 <?php
 
-class csrfGuard
+class csrfProtector
 {
 	/**
 	 * Name of the cookie sent to client
@@ -25,14 +25,14 @@ class csrfGuard
 
 	
 	/**
-	 * function to initialise the CSRFGuard work flow
+	 * function to initialise the csrfProtector work flow
 	 */
 	public static function initialise()
 	{
 		//#todo: code to check origin of the reqeust
 
 		//authorise the incoming request
-		csrfGuard::authorisePost();
+		csrfProtector::authorisePost();
 	}
 
 	/**
@@ -45,9 +45,9 @@ class csrfGuard
 		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 			//currently for same origin only
-			if(!(isset($_POST[csrfGuard::$postName]) 
-				&& isset($_COOKIE[csrfGuard::$cookieName])
-				&& ($_POST[csrfGuard::$postName] === $_COOKIE[csrfGuard::$cookieName])
+			if(!(isset($_POST[csrfProtector::$postName]) 
+				&& isset($_COOKIE[csrfProtector::$cookieName])
+				&& ($_POST[csrfProtector::$postName] === $_COOKIE[csrfProtector::$cookieName])
 				)) {
 
 				//#todo: if validations fails
@@ -62,7 +62,7 @@ class csrfGuard
 		 * in case cookie exist -> refresh it
 		 * else create one
 		 */
-		csrfGuard::refreshCookie();	
+		csrfProtector::refreshCookie();	
 	}
 
 	/**
@@ -70,11 +70,11 @@ class csrfGuard
 	 */
 	public static function refreshCookie()
 	{
-		if(!isset($_COOKIE[csrfGuard::$cookieName])) {
-			csrfGuard::createCookie();
+		if(!isset($_COOKIE[csrfProtector::$cookieName])) {
+			csrfProtector::createCookie();
 		} else {
 			//reset the cookie to a longer period
-			setcookie(csrfGuard::$cookieName, $_COOKIE[csrfGuard::$cookieName], time() + csrfGuard::$cookieExpiryTime);
+			setcookie(csrfProtector::$cookieName, $_COOKIE[csrfProtector::$cookieName], time() + csrfProtector::$cookieExpiryTime);
 		}
 	}
 
@@ -83,7 +83,7 @@ class csrfGuard
 	 */
 	public static function createCookie()
 	{
-		setcookie(csrfGuard::$cookieName, csrfGuard::generateAuthToken(128), time() + csrfGuard::$cookieExpiryTime);
+		setcookie(csrfProtector::$cookieName, csrfProtector::generateAuthToken(128), time() + csrfProtector::$cookieExpiryTime);
 	}
 
 	/**
@@ -91,7 +91,7 @@ class csrfGuard
 	 * max length = 128
 	 * @param: length to hash required, int
 	 */
-	public static function generateAuthToken($length = 128)
+	public static function generateAuthToken($length = 64)
 	{
 		//if $length > 128 throw exception #todo 
 

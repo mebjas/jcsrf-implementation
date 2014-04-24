@@ -1,7 +1,7 @@
 <?php
 
-include_once __DIR__ .'/config/csrf.config.inc.php';
-include_once __DIR__ .'/libs/csrf.php';
+include_once __DIR__ .'/config/csrfp.config.inc.php';
+include_once __DIR__ .'/libs/csrfp.php';
 
 //Initialise CSRFGuard library
 csrfGuard::initialise();
@@ -25,18 +25,15 @@ function csrf_ob_handler($buffer, $flags) {
         }
     }
 
-    //#todo check if file exists
-    if(CSRFGuard::$isSameOrigin) {
-        if(!file_exists(CSRFGUARD_SELF .SAME_ORIGIN_JS)) {
-            die("CSRFGuard js file not found!");
-        }
-    	$script = '<script type="text/javascript" src="' .CSRFGUARD_SELF .SAME_ORIGIN_JS .'"></script>';	
-    } else {
-        if(!file_exists(CSRFGUARD_SELF .CROSS_ORIGIN_JS)) {
-            die("CSRFGuard js file not found!");
-        }
-    	$script = '<script type="text/javascript" src="' .CSRFGUARD_SELF .CROSS_ORIGIN_JS .'"></script>';
+    
+    if(!file_exists(CSRFGUARD_SELF .CSRFP_JS)) {
+        die("CSRFGuard js file not found!");
     }
+
+    //script to add array of whitelisted outgoing domains 
+    //#todo: keep it in tolower()
+    $script = '<script type="text/javascript">'.'</script>';
+    $script = '<script type="text/javascript" src="' .CSRFGUARD_SELF .CSRFP_JS .'"></script>';	
 
     //implant the CSRFGuard js file to outgoing script
     $buffer = str_ireplace('</body>', $script . '</body>', $buffer, $count);
