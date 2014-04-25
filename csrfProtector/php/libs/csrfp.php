@@ -30,7 +30,7 @@ class csrfProtector
 	public static function initialise()
 	{
 		//authorise the incoming request
-		csrfProtector::authorisePost();
+		self::authorisePost();
 
 		// Initialize our handler
 		ob_start('csrfProtector::ob_handler');	
@@ -47,9 +47,9 @@ class csrfProtector
 		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 			//currently for same origin only
-			if(!(isset($_POST[csrfProtector::$postName]) 
-				&& isset($_COOKIE[csrfProtector::$cookieName])
-				&& ($_POST[csrfProtector::$postName] === $_COOKIE[csrfProtector::$cookieName])
+			if(!(isset($_POST[self::$postName]) 
+				&& isset($_COOKIE[self::$cookieName])
+				&& ($_POST[self::$postName] === $_COOKIE[self::$cookieName])
 				)) {
 
 				if($logging) {
@@ -71,7 +71,7 @@ class csrfProtector
 		 * in case cookie exist -> refresh it
 		 * else create one
 		 */
-		csrfProtector::refreshCookie();	
+		self::refreshCookie();	
 	}
 
 	/**
@@ -80,13 +80,13 @@ class csrfProtector
 	 */
 	public static function refreshCookie()
 	{
-		if(!isset($_COOKIE[csrfProtector::$cookieName])) {
-			csrfProtector::createCookie();
+		if(!isset($_COOKIE[self::$cookieName])) {
+			self::createCookie();
 		} else {
 			//reset the cookie to a longer period
-			setcookie(csrfProtector::$cookieName, 
-				$_COOKIE[csrfProtector::$cookieName], 
-				time() + csrfProtector::$cookieExpiryTime);
+			setcookie(self::$cookieName, 
+				$_COOKIE[self::$cookieName], 
+				time() + self::$cookieExpiryTime);
 		}
 	}
 
@@ -96,9 +96,9 @@ class csrfProtector
 	 */
 	public static function createCookie()
 	{
-		setcookie(csrfProtector::$cookieName, 
-			csrfProtector::generateAuthToken(), 
-			time() + csrfProtector::$cookieExpiryTime);
+		setcookie(self::$cookieName, 
+			self::generateAuthToken(), 
+			time() + self::$cookieExpiryTime);
 	}
 
 	/**
@@ -159,7 +159,7 @@ class csrfProtector
 
 	    $script = "
 	    <script type='text/javascript'>
-	        var csrfProtectorToken = '" .csrfProtector::$cookieName ."';\n</script>";
+	        var csrfProtectorToken = '" .self::$cookieName ."';\n</script>";
 	    $script .= '<script type="text/javascript" src="' .CSRFP_SELF .CSRFP_JS .'"></script>';	
 
 	    //implant the CSRFGuard js file to outgoing script
