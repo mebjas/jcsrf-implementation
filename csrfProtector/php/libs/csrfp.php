@@ -57,12 +57,12 @@ class csrfProtector
 				}
 				
 				switch ($action) {
-					case 1:
-						//show 404 / 403
-						break;
-					default:
-						unset($_POST);
-						break;
+				case 1:
+					//show 404 / 403
+					break;
+				default:
+					unset($_POST);
+					break;
 				}					
 			}
 		} 
@@ -153,7 +153,7 @@ class csrfProtector
 	    }
 
 	    
-	    if(!file_exists(CSRFGUARD_SELF .CSRFP_JS)) {
+	    if(!file_exists(CSRFP_SELF .CSRFP_JS)) {
 	        //die("CSRFGuard js file not found!");
 	    }
 
