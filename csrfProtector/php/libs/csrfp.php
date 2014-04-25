@@ -29,8 +29,6 @@ class csrfProtector
 	 */
 	public static function initialise()
 	{
-		//#todo: code to check origin of the reqeust
-
 		//authorise the incoming request
 		csrfProtector::authorisePost();
 	}
@@ -38,7 +36,7 @@ class csrfProtector
 	/**
 	 * function to authorise incoming post requests
 	 */
-	public static function authorisePost()
+	public static function authorisePost($logging = true, $action = 0)
 	{
 		//#todo this method is valid for same origin request only
 		//for cross origin the functionality is different
@@ -50,11 +48,18 @@ class csrfProtector
 				&& ($_POST[csrfProtector::$postName] === $_COOKIE[csrfProtector::$cookieName])
 				)) {
 
-				//#todo: if validations fails
-				//#perform as per configuration
-
-				//default operation: strip all post
-				unset($_POST);	
+				if($logging) {
+					//#todo: perform logging, in default action
+				}
+				
+				switch ($action) {
+					case 1:
+						//show 404 / 403
+						break;
+					default:
+						unset($_POST);
+						break;
+				}					
 			}
 		} 
 

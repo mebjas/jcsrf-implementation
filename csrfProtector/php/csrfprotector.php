@@ -4,7 +4,7 @@ include_once __DIR__ .'/config/csrfp.config.inc.php';
 include_once __DIR__ .'/libs/csrfp.php';
 
 //Initialise CSRFGuard library
-csrfGuard::initialise();
+csrfProtector::initialise();
 
 /**
  * Rewrites <form> on the fly to add CSRF tokens to them. This can also
@@ -27,13 +27,11 @@ function csrf_ob_handler($buffer, $flags) {
 
     
     if(!file_exists(CSRFGUARD_SELF .CSRFP_JS)) {
-        die("CSRFGuard js file not found!");
+        exit("CSRFGuard js file not found!");
     }
 
-    //script to add array of whitelisted outgoing domains 
-    //#todo: keep it in tolower()
-    $script = '<script type="text/javascript">'.'</script>';
-    $script = '<script type="text/javascript" src="' .CSRFGUARD_SELF .CSRFP_JS .'"></script>';	
+    $script = "<input type='hidden' name='CSRFPROTECTOR_TOKEN_NAME' value='" .csrfProtector::$cookieName ."'>";
+    $script .= '<script type="text/javascript" src="' .CSRFP_SELF .CSRFP_JS .'"></script>';	
 
     //implant the CSRFGuard js file to outgoing script
     $buffer = str_ireplace('</body>', $script . '</body>', $buffer, $count);
