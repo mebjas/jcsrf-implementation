@@ -31,6 +31,10 @@ class csrfProtector
 	{
 		//authorise the incoming request
 		csrfProtector::authorisePost();
+
+		// Initialize our handler
+		ob_start('csrfProtector::ob_handler');	
+		//#todo: feature to not run this when required
 	}
 
 	/**
@@ -72,6 +76,7 @@ class csrfProtector
 
 	/**
 	 * function to refresh cookie sent to browser
+	 * @param: void
 	 */
 	public static function refreshCookie()
 	{
@@ -79,16 +84,21 @@ class csrfProtector
 			csrfProtector::createCookie();
 		} else {
 			//reset the cookie to a longer period
-			setcookie(csrfProtector::$cookieName, $_COOKIE[csrfProtector::$cookieName], time() + csrfProtector::$cookieExpiryTime);
+			setcookie(csrfProtector::$cookieName, 
+				$_COOKIE[csrfProtector::$cookieName], 
+				time() + csrfProtector::$cookieExpiryTime);
 		}
 	}
 
 	/**
-	 * 
+	 * function to set auth cookie 
+	 * @param: void
 	 */
 	public static function createCookie()
 	{
-		setcookie(csrfProtector::$cookieName, csrfProtector::generateAuthToken(128), time() + csrfProtector::$cookieExpiryTime);
+		setcookie(csrfProtector::$cookieName, 
+			csrfProtector::generateAuthToken(), 
+			time() + csrfProtector::$cookieExpiryTime);
 	}
 
 	/**
@@ -119,6 +129,46 @@ class csrfProtector
 			}
 		}
 		return substr($token, 0, $length);
+	}
+
+	/**
+	 * Rewrites <form> on the fly to add CSRF tokens to them. This can also
+	 * inject our JavaScript library.
+	 * @param: $buffer, output buffer to which all output are stored
+	 * @param: flag
+	 */
+	public static function ob_handler($buffer, $flags)
+	{
+		// Even though the user told us to rewrite, we should do a quick heuristic
+	    // to check if the page is *actually* HTML. We don't begin rewriting until
+	    // we hit the first <html tag.
+	    static $is_html = false;
+	    if (!$is_html) {
+	        // not HTML until proven otherwise
+	        if (stripos($buffer, '<html') !== false) {
+	            $is_html = true;
+	        } else {
+	            return $buffer;
+	        }
+	    }
+
+	    
+	    if(!file_exists(CSRFGUARD_SELF .CSRFP_JS)) {
+	        //die("CSRFGuard js file not found!");
+	    }
+
+	    $script = "
+	    <script type='text/javascript'>
+	        var csrfProtectorToken = '" .csrfProtector::$cookieName ."';\n</script>";
+	    $script .= '<script type="text/javascript" src="' .CSRFP_SELF .CSRFP_JS .'"></script>';	
+
+	    //implant the CSRFGuard js file to outgoing script
+	    $buffer = str_ireplace('</body>', $script . '</body>', $buffer, $count);
+	    if (!$count) {
+	        $buffer .= $script;
+	    }
+
+	    return $buffer;
 	}
 };
 
