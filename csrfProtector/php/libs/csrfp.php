@@ -47,7 +47,7 @@ class csrfProtector
 		if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 			//currently for same origin only
-			if(!(isset($_POST[self::$postName]) 
+			if (!(isset($_POST[self::$postName]) 
 				&& isset($_COOKIE[self::$cookieName])
 				&& ($_POST[self::$postName] === $_COOKIE[self::$cookieName])
 				)) {
@@ -80,7 +80,7 @@ class csrfProtector
 	 */
 	public static function refreshCookie()
 	{
-		if(!isset($_COOKIE[self::$cookieName])) {
+		if (!isset($_COOKIE[self::$cookieName])) {
 			self::createCookie();
 		} else {
 			//reset the cookie to a longer period
@@ -113,19 +113,15 @@ class csrfProtector
 		if (function_exists("hash_algos") && in_array("sha512", hash_algos())) {
 			$token = hash("sha512", mt_rand(0, mt_getrandmax()));
 		} else {
-			$token=' ';
-			for ($i=0;$i<128;++$i)
-			{
-				$r=mt_rand(0,35);
-				if ($r<26)
-				{
-					$c=chr(ord('a')+$r);
+			$token = '';
+			for ($i = 0; $i < 128; ++$i) {
+				$r = mt_rand(0, 35);
+				if ($r < 26) {
+					$c = chr(ord('a') + $r);
+				} else { 
+					$c = chr(ord('0') + $r - 26);
 				}
-				else
-				{ 
-					$c=chr(ord('0')+$r-26);
-				} 
-				$token.=$c;
+				$token .= $c;
 			}
 		}
 		return substr($token, 0, $length);
@@ -153,7 +149,7 @@ class csrfProtector
 	    }
 
 	    
-	    if(!file_exists(CSRFP_SELF .CSRFP_JS)) {
+	    if (!file_exists(CSRFP_SELF .CSRFP_JS)) {
 	        //die("CSRFGuard js file not found!");
 	    }
 
